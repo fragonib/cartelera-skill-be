@@ -9,7 +9,7 @@ const {or, iff} = require(__dirname + '/utils.js');
 
 const searchMovie = function (movieQuery) {
 
-  global.log.info('[SEARCH] ' + movieQuery);
+  global.log.info('[CRAWLER] Search query: ' + movieQuery);
 
   const movieRequest = buildMovieSearchRequest(movieQuery);
   global.log.info('[HTTP] GET ' + movieRequest.uri);
@@ -20,7 +20,7 @@ const searchMovie = function (movieQuery) {
       const searchResults = body.items || [];
       const hasMovieLink = item => item.link.match(/film\d{4,8}\.html/);
       const candidates = searchResults.filter(hasMovieLink);
-      global.log.info('[CRAWLER] Candidates (%s)', candidates.length);
+      global.log.info('[CRAWLER] Found (%s) movie candidates', candidates.length);
 
       const movies = candidates.map(movie => ({
         title: S.maybeToNullable(movieValueExtractor('title')(movie)),
@@ -29,20 +29,20 @@ const searchMovie = function (movieQuery) {
         numRatings: S.maybeToNullable(movieValueExtractor('numRatings')(movie)),
       }));
 
-      const firstMovie = movies[0];
-      global.log.info('[CRAWLER] First movie', firstMovie);
+      const firstMovie = S.head(movies);
+      global.log.info('[CRAWLER] First movie candidate:', firstMovie);
 
       return firstMovie;
 
     })
     .catch(function (error) {
 
-      global.log.error('Some error happened with request: ', error);
-      if (response && response.statusCode) {
-        global.log.error(response.statusCode + "\n");
+      global.log.error('[HTTP] Some error happened with request: ', error);
+      if (error.statusCode) {
+        global.log.error('[HTTP] Response code: ' + error.statusCode + "\n");
       }
 
-      return error;
+      return S.Nothing;
 
     });
 };

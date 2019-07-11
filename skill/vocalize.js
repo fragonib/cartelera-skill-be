@@ -59,5 +59,5 @@ const vocalizeNumRating = function(movie) {
 
 module.exports = {
     vocalizeMovie : vocalizeMovie,
-    vocalizeMovieNotFound : vocalizeMovieNotFound,
+    vocalizeNoMovieFound : vocalizeMovieNotFound,
 };
