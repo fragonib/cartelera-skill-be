@@ -1,0 +1,6 @@
+{
+  "proxy": "http://127.0.0.1:8123",
+  "movie_review_source_url": "https://www.googleapis.com/customsearch/v1?key=${key}&cx=${cx}",
+  "source_timeout_in_millis": 2000,
+  "maximum_num_errors_loading_review": 5
+}

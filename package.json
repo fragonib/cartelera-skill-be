@@ -1,0 +1,40 @@
+{
+  "name": "cartelera-skill-be",
+  "version": "1.0.0",
+  "description": "Gets a film ranking from filmaffinity.com",
+  "main": "skill/intent.js",
+  "scripts": {
+    "test": "mocha test/test.js"
+  },
+  "author": "fragonib",
+  "license": "MIT",
+  "homepage": "http://www.github.com/fragonib",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fragonib/cartelera-skill-be.git"
+  },
+  "dependencies": {
+    "ask-sdk-core": "latest",
+    "cheerio": "^0.20",
+    "deindent": "^0.1.0",
+    "es6-template-render": "^1.3.1",
+    "graceful-fs": "^4.1",
+    "random-useragent": "^0.3",
+    "request": "^2.88",
+    "try-monad": "^0.1.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "chai-xml": "^0.3.2",
+    "maybe-chai": "^1.0.2",
+    "mocha": "^6.1.4",
+    "monet": "^0.9.0",
+    "sanctuary": "^2.0.0",
+    "sanctuary-def": "latest",
+    "sanctuary-maybe": "latest",
+    "sanctuary-type-identifiers": "latest",
+    "sinon": "^7.3.2",
+    "sinon-as-promised": "^4.0.3"
+  }
+}
