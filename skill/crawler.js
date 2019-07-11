@@ -1,7 +1,9 @@
+const S = require("sanctuary");
+const $ = require("sanctuary-def");
 const request = require('request');
-const Try = require('try-monad');
 const useragent = require('random-useragent');
 const interpolate = require('es6-template-render');
+const { or, iff } = require(__dirname + '/utils.js')
 
 const buildFilmSearchRequest = function(filmQuery) {
     return {
@@ -16,18 +18,26 @@ const buildFilmSearchRequest = function(filmQuery) {
     }
 };
 
-const processFilmValue = function(field, film) {
+const filmValueExtractor = function(field) {
     switch (field) {
-        case "title":
-            return Try(() => film.pagemap.movie[0].name).orElse(null);
-        case "year":
-            return Try(() => parseInt(film.pagemap.movie[0].datepublished)).orElse(null);
-        case "rating":
-            return Try(() => parseFloat(film.pagemap.moviereview[0].originalrating.replace(',', '.'))).orElse(null);
-        case "numRatings":
-            return Try(() => parseInt(film.pagemap.moviereview[0].votes)).orElse(null);
+        case "title": return S.pipe([
+                S.gets(S.is($.String))(['pagemap', 'movie', '0', 'name'])
+            ]);
+        case "year": return S.pipe([
+                S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'movie', '0', 'datepublished']),
+                S.chain(iff(S.is($.String))(S.parseInt(10))),
+            ]);
+        case "rating": return S.pipe([
+                S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'moviereview', '0', 'originalrating']),
+                S.map(rating => rating.replace(',', '.')),
+                S.chain(iff(S.is($.String))(S.parseFloat)),
+            ]);
+        case "numRatings": return S.pipe([
+                S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'moviereview', '0', 'votes']),
+                S.chain(iff(S.is($.String))(S.parseInt(10))),
+            ]);
         default:
-            return null;
+            return () => Maybe.Nothing;
     }
 };
 
@@ -53,10 +63,10 @@ const searchFilm = function(filmQuery, callback) {
             global.log.info('[CRAWLER] Candidates (%s)', candidates.length);
 
             const films = candidates.map(film => ({
-                title: processFilmValue('title', film),
-                year: processFilmValue('year', film),
-                rating: processFilmValue('rating', film),
-                numRatings: processFilmValue('numRatings', film),
+                title: S.maybeToNullable(filmValueExtractor('title')(film)),
+                year: S.maybeToNullable(filmValueExtractor('year')(film)),
+                rating: S.maybeToNullable(filmValueExtractor('rating')(film)),
+                numRatings: S.maybeToNullable(filmValueExtractor('numRatings')(film)),
             }));
 
             const firstFilm = films[0];

@@ -1,12 +1,7 @@
-const _try = function(func, fallbackValue) {
-    try {
-        const value = func();
-        return (value === null || value === undefined) ? fallbackValue : value;
-    } catch (e) {
-        return fallbackValue;
-    }
-};
+const or = (...fns) => a => fns.reduce((r, f) => r || f(a), false);
+const iff = cond => f => a => cond(a) ? f(a) : S.Just(a);
 
 module.exports = {
-    _try: _try
+    or: or,
+    iff: iff
 };

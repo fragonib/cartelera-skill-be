@@ -16,9 +16,8 @@ describe("Sanctuary spike", function() {
   // System under test
   const or = (...fns) => a => fns.reduce((r, f) => r || f(a), false);
   const iff = cond => f => a => cond(a) ? f(a) : S.Just(a);
-  const isStringOrNumber = or(S.is($.String), S.is($.Number));
   const extractVotes = S.pipe([
-    S.gets(isStringOrNumber)(['pagemap', 'moviereview', '0', 'votes']),
+    S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'moviereview', '0', 'votes']),
     S.chain(iff(S.is($.String))(S.parseInt(10))),
   ]);
 
