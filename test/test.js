@@ -14,7 +14,7 @@ describe("Movie rater", function() {
 
     const rater = require(__dirname + '/../skill/rater.js');
 
-    it('should resolve a movie with all review informed', function() {
+    it('should vocalize a full movie review', function() {
 
         const filmName = 'matrix';
 
@@ -26,21 +26,21 @@ describe("Movie rater", function() {
                 para "Matrix", de <say-as interpret-as="cardinal">1999</say-as>.
             </speak>
             `);
-        return result.then(function(value) {
-            expect(value).xml.to.equal(expectedSpeech);
+        return result.then(function(speech) {
+            expect(speech).xml.to.equal(expectedSpeech);
         });
 
     });
 
-    it('should inform when film doesnt exist', function() {
+    it('should vocalize film doesnt exist', function() {
 
         const filmName = 'unexistent movie';
 
         const result = rater.rateFilm(filmName);
 
         const expectedSpeech = `<speak>Lo siento, no he podido encontrar la película "unexistent movie"</speak>`;
-        return result.then(function(value) {
-            expect(value).xml.to.equal(expectedSpeech);
+        return result.then(function(speech) {
+            expect(speech).xml.to.equal(expectedSpeech);
         });
 
     });

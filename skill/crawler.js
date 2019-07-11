@@ -2,7 +2,7 @@ const S = require("sanctuary");
 const $ = require("sanctuary-def");
 const rp = require('request-promise');
 const useragent = require('random-useragent');
-const interpolate = require('es6-template-render');
+const resolveTemplate = require('es6-template-render');
 const {UriBuilder} = require('uribuilder');
 const {or, iff} = require(__dirname + '/utils.js');
 
@@ -42,11 +42,13 @@ const searchFilm = function (filmQuery) {
         global.log.error(response.statusCode + "\n");
       }
 
+      return error;
+
     });
 };
 
 const buildFilmSearchRequest = function (filmQuery) {
-  const baseUri = interpolate(global.parameters.movie_review_source_url, global.secrets.google_customsearch_api);
+  const baseUri = resolveTemplate(global.parameters.movie_review_source_url, global.secrets.google_customsearch_api);
   const targetUri = UriBuilder.updateQuery(baseUri, {q: filmQuery});
   const timeout = global.parameters.source_timeout_in_millis;
   return {
@@ -81,7 +83,8 @@ const filmValueExtractor = function (field) {
         S.chain(iff(S.is($.String))(S.parseInt(10))),
       ]);
     default:
-      return () => Maybe.Nothing;
+      const voidExtractor = () => Maybe.Nothing;
+      return voidExtractor;
   }
 };
 
