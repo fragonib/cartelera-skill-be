@@ -1,44 +1,44 @@
 const deindent = require('deindent');
 
-const vocalizeFilmNotFound = function(query) {
+const vocalizeMovieNotFound = function(query) {
     const speech = `<speak>Lo siento, no he podido encontrar la película "${query}"</speak>`;
     global.log.info("[VOCALIZER]", speech);
     return speech;
 };
 
-const vocalizeFilm = function(film) {
+const vocalizeMovie = function(movie) {
     const speech = deindent(`
         <speak>
-            ${vocalizeRating(film)}${vocalizeNumRating(film)} en <lang xml:lang="en-US">filmaffinity</lang>,
-            para ${vocalizeTitle(film)}${vocalizeYear(film)}.
+            ${vocalizeRating(movie)}${vocalizeNumRating(movie)} en <lang xml:lang="en-US">filmaffinity</lang>,
+            para ${vocalizeTitle(movie)}${vocalizeYear(movie)}.
         </speak>`);
     global.log.info("[VOCALIZER]", speech);
     return speech;
 };
 
-const vocalizeTitle = function(film) {
-    return `"${film.title.replace(/[.:]/, ',')}"`;
+const vocalizeTitle = function(movie) {
+    return `"${movie.title.replace(/[.:]/, ',')}"`;
 };
 
-const vocalizeYear = function(film) {
-    if (film.year === null)
+const vocalizeYear = function(movie) {
+    if (movie.year === null)
         return '';
-    return `, de <say-as interpret-as="cardinal">${film.year}</say-as>`;
+    return `, de <say-as interpret-as="cardinal">${movie.year}</say-as>`;
 };
 
-const vocalizeRating = function(film) {
-    if (film.rating === null)
+const vocalizeRating = function(movie) {
+    if (movie.rating === null)
         return 'No está disponible';
-    let replace = film.rating.toLocaleString('ES');
+    let replace = movie.rating.toLocaleString('ES');
     return `<say-as interpret-as="cardinal">${replace}</say-as>`;
 };
 
-const vocalizeNumRating = function(film) {
+const vocalizeNumRating = function(movie) {
 
-    if (film.numRatings === null)
+    if (movie.numRatings === null)
         return '';
 
-    const numberString = String(film.numRatings);
+    const numberString = String(movie.numRatings);
     const numberLength = numberString.length;
     const bigNumberLength = [ 0, 4, 6 ];
     const bigNumUnit = [ 0, 2, 3 ];
@@ -58,6 +58,6 @@ const vocalizeNumRating = function(film) {
 };
 
 module.exports = {
-    vocalizeFilm : vocalizeFilm,
-    vocalizeFilmNotFound : vocalizeFilmNotFound,
+    vocalizeMovie : vocalizeMovie,
+    vocalizeMovieNotFound : vocalizeMovieNotFound,
 };

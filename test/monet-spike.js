@@ -20,45 +20,45 @@ describe("Monet spike", function() {
     }
   };
 
-  const extractVotes = film =>
-    Try(() => film.pagemap.moviereview[0].votes)
+  const extractVotes = movie =>
+    Try(() => movie.pagemap.moviereview[0].votes)
       .toMaybe()
       .map(parseInt)
       .filterNot(isNaN);
 
   it('root node is wrong', function() {
-    const film = { wrong: { moviereview: [ { votes: 5 } ] } };
-    const result = extractVotes(film);
+    const movie = { wrong: { moviereview: [ { votes: 5 } ] } };
+    const result = extractVotes(movie);
     expect(result).to.be.nothing();
   });
 
   it('list node is empty', function() {
-    const film = { pagemap: { moviereview: [] } };
-    const result = extractVotes(film);
+    const movie = { pagemap: { moviereview: [] } };
+    const result = extractVotes(movie);
     expect(result).to.be.nothing();
   });
 
   it('leaf node is wrong', function() {
-    const film = { pagemap: { moviereview: [ { wrong: 5 } ] } };
-    const result = extractVotes(film);
+    const movie = { pagemap: { moviereview: [ { wrong: 5 } ] } };
+    const result = extractVotes(movie);
     expect(result).to.be.nothing();
   });
 
   it('leaf node is number', function() {
-    const film = { pagemap: { moviereview: [ { votes: 5 } ] } };
-    const result = extractVotes(film);
+    const movie = { pagemap: { moviereview: [ { votes: 5 } ] } };
+    const result = extractVotes(movie);
     expect(result).to.be.just(5);
   });
 
   it('leaf node is valid string', function() {
-    const film = { pagemap: { moviereview: [ { votes: "5" } ] } };
-    const result = extractVotes(film);
+    const movie = { pagemap: { moviereview: [ { votes: "5" } ] } };
+    const result = extractVotes(movie);
     expect(result).to.be.just(5);
   });
 
   it('leaf node is invalid string', function() {
-    const film = { pagemap: { moviereview: [ { votes: "a" } ] } };
-    const result = extractVotes(film);
+    const movie = { pagemap: { moviereview: [ { votes: "a" } ] } };
+    const result = extractVotes(movie);
     expect(result).to.be.nothing();
   });
 

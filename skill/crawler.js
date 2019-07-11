@@ -7,14 +7,14 @@ const {UriBuilder} = require('uribuilder');
 const {or, iff} = require(__dirname + '/utils.js');
 
 
-const searchFilm = function (filmQuery) {
+const searchMovie = function (movieQuery) {
 
-  global.log.info('[SEARCH] ' + filmQuery);
+  global.log.info('[SEARCH] ' + movieQuery);
 
-  const filmRequest = buildFilmSearchRequest(filmQuery);
-  global.log.info('[HTTP] GET ' + filmRequest.uri);
+  const movieRequest = buildMovieSearchRequest(movieQuery);
+  global.log.info('[HTTP] GET ' + movieRequest.uri);
 
-  return rp(filmRequest)
+  return rp(movieRequest)
     .then(function (body) {
 
       const searchResults = body.items || [];
@@ -22,17 +22,17 @@ const searchFilm = function (filmQuery) {
       const candidates = searchResults.filter(hasMovieLink);
       global.log.info('[CRAWLER] Candidates (%s)', candidates.length);
 
-      const films = candidates.map(film => ({
-        title: S.maybeToNullable(filmValueExtractor('title')(film)),
-        year: S.maybeToNullable(filmValueExtractor('year')(film)),
-        rating: S.maybeToNullable(filmValueExtractor('rating')(film)),
-        numRatings: S.maybeToNullable(filmValueExtractor('numRatings')(film)),
+      const movies = candidates.map(movie => ({
+        title: S.maybeToNullable(movieValueExtractor('title')(movie)),
+        year: S.maybeToNullable(movieValueExtractor('year')(movie)),
+        rating: S.maybeToNullable(movieValueExtractor('rating')(movie)),
+        numRatings: S.maybeToNullable(movieValueExtractor('numRatings')(movie)),
       }));
 
-      const firstFilm = films[0];
-      global.log.info('[CRAWLER] First film', firstFilm);
+      const firstMovie = movies[0];
+      global.log.info('[CRAWLER] First movie', firstMovie);
 
-      return firstFilm;
+      return firstMovie;
 
     })
     .catch(function (error) {
@@ -47,9 +47,9 @@ const searchFilm = function (filmQuery) {
     });
 };
 
-const buildFilmSearchRequest = function (filmQuery) {
+const buildMovieSearchRequest = function (movieQuery) {
   const baseUri = resolveTemplate(global.parameters.movie_review_source_url, global.secrets.google_customsearch_api);
-  const targetUri = UriBuilder.updateQuery(baseUri, {q: filmQuery});
+  const targetUri = UriBuilder.updateQuery(baseUri, {q: movieQuery});
   const timeout = global.parameters.source_timeout_in_millis;
   return {
     method: 'GET',
@@ -60,7 +60,7 @@ const buildFilmSearchRequest = function (filmQuery) {
   }
 };
 
-const filmValueExtractor = function (field) {
+const movieValueExtractor = function (field) {
   switch (field) {
     case "title":
       return S.pipe([
@@ -90,5 +90,5 @@ const filmValueExtractor = function (field) {
 
 
 module.exports = {
-  searchFilm: searchFilm
+  searchMovie: searchMovie
 };

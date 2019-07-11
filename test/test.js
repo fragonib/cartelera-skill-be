@@ -12,35 +12,35 @@ const deindent = require('deindent');
 
 describe("Movie rater", function() {
 
-    const rater = require(__dirname + '/../skill/rater.js');
+    const rater = require(__dirname + '/../skill/ranker.js');
 
     it('should vocalize a full movie review', function() {
 
-        const filmName = 'matrix';
+        const movieName = 'matrix';
 
-        const result = rater.rateFilm(filmName);
+        const result = rater.rateMovie(movieName);
 
-        const expectedSpeech = deindent(`
-            <speak>
-                <say-as interpret-as="cardinal">7,9</say-as> con <say-as interpret-as="cardinal">193000</say-as> votos en <lang xml:lang="en-US">filmaffinity</lang>,
-                para "Matrix", de <say-as interpret-as="cardinal">1999</say-as>.
-            </speak>
-            `);
         return result.then(function(speech) {
-            expect(speech).xml.to.equal(expectedSpeech);
+            expect(speech).xml.to.equal(deindent(`
+                <speak>
+                    <say-as interpret-as="cardinal">7,9</say-as> con <say-as interpret-as="cardinal">193000</say-as> votos en <lang xml:lang="en-US">filmaffinity</lang>,
+                    para "Matrix", de <say-as interpret-as="cardinal">1999</say-as>.
+                </speak>
+            `));
         });
 
     });
 
-    it('should vocalize film doesnt exist', function() {
+    it('should vocalize movie doesnt exist', function() {
 
-        const filmName = 'unexistent movie';
+        const movieName = 'unexistent movie';
 
-        const result = rater.rateFilm(filmName);
+        const result = rater.rateMovie(movieName);
 
-        const expectedSpeech = `<speak>Lo siento, no he podido encontrar la película "unexistent movie"</speak>`;
         return result.then(function(speech) {
-            expect(speech).xml.to.equal(expectedSpeech);
+            expect(speech).xml.to.equal(
+              `<speak>Lo siento, no he podido encontrar la película "unexistent movie"</speak>`
+            );
         });
 
     });

@@ -2,7 +2,7 @@
 // Please visit https://alexa.design/cookbook for additional examples on implementing slots, dialog management,
 // session persistence, api calls, and more.
 const Alexa = require('ask-sdk-core');
-const rater = require(__dirname + '/rater.js');
+const rater = require(__dirname + '/ranker.js');
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -33,14 +33,14 @@ const CancelAndStopIntentHandler = {
             .getResponse();
     }
 };
-const FilmRankingHandler = {
+const MovieRankingHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'FilmRankingIntent';
+            && handlerInput.requestEnvelope.request.intent.name === 'MovieRankingIntent';
     },
     async handle(handlerInput) {
-        const filmName = handlerInput.requestEnvelope.request.intent.slots.film.value;
-        const speechText = await rater.rateFilm(filmName);
+        const movieName = handlerInput.requestEnvelope.request.intent.slots.movie.value;
+        const speechText = await rater.rateMovie(movieName);
 
         return handlerInput.responseBuilder
             .speak(speechText)
@@ -102,7 +102,7 @@ const ErrorHandler = {
 // defined are included below. The order matters - they're processed top to bottom.
 exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
-        FilmRankingHandler,
+        MovieRankingHandler,
         LaunchRequestHandler,
         CancelAndStopIntentHandler,
         SessionEndedRequestHandler,
