@@ -1,84 +1,91 @@
 const S = require("sanctuary");
 const $ = require("sanctuary-def");
-const request = require('request');
+const rp = require('request-promise');
 const useragent = require('random-useragent');
 const interpolate = require('es6-template-render');
-const { or, iff, callbackToPromise } = require(__dirname + '/utils.js');
-const { UriBuilder } = require('uribuilder');
+const {UriBuilder} = require('uribuilder');
+const {or, iff} = require(__dirname + '/utils.js');
 
 
-const buildFilmSearchRequest = function(filmQuery) {
-    const baseUri = interpolate(global.parameters.movie_review_source_url, global.secrets.google_customsearch_api);
-    const targetUri = UriBuilder.updateQuery(baseUri, { q: filmQuery });
-    const timeout = global.parameters.source_timeout_in_millis;
-    return {
-        method: 'GET',
-        json: true,
-        uri: targetUri,
-        timeout: timeout,
-        headers: { 'User-Agent': useragent.getRandom() }
-    }
-};
+const searchFilm = function (filmQuery) {
 
-const filmValueExtractor = function(field) {
-    switch (field) {
-        case "title": return S.pipe([
-                S.gets(S.is($.String))(['pagemap', 'movie', '0', 'name'])
-            ]);
-        case "year": return S.pipe([
-                S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'movie', '0', 'datepublished']),
-                S.chain(iff(S.is($.String))(S.parseInt(10))),
-            ]);
-        case "rating": return S.pipe([
-                S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'moviereview', '0', 'originalrating']),
-                S.map(rating => rating.replace(',', '.')),
-                S.chain(iff(S.is($.String))(S.parseFloat)),
-            ]);
-        case "numRatings": return S.pipe([
-                S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'moviereview', '0', 'votes']),
-                S.chain(iff(S.is($.String))(S.parseInt(10))),
-            ]);
-        default:
-            return () => Maybe.Nothing;
-    }
-};
+  global.log.info('[SEARCH] ' + filmQuery);
 
-const searchFilm = function(filmQuery, callback) {
+  const filmRequest = buildFilmSearchRequest(filmQuery);
+  global.log.info('[HTTP] GET ' + filmRequest.uri);
 
-    global.log.info('[SEARCH] ' + filmQuery);
+  return rp(filmRequest)
+    .then(function (body) {
 
-    const filmRequest = buildFilmSearchRequest(filmQuery);
-    global.log.info('[HTTP] GET ' + filmRequest.uri);
+      const searchResults = body.items || [];
+      const hasMovieLink = item => item.link.match(/film\d{4,8}\.html/);
+      const candidates = searchResults.filter(hasMovieLink);
+      global.log.info('[CRAWLER] Candidates (%s)', candidates.length);
 
-    request.get(filmRequest, function (error, response, body) {
-        if (error || response.statusCode !== 200) {
-            global.log.error('Some error happened with request: ', error);
-            if (response && response.statusCode) {
-                global.log.error(response.statusCode + "\n");
-            }
-            callback(null)
-        }
-        else {
+      const films = candidates.map(film => ({
+        title: S.maybeToNullable(filmValueExtractor('title')(film)),
+        year: S.maybeToNullable(filmValueExtractor('year')(film)),
+        rating: S.maybeToNullable(filmValueExtractor('rating')(film)),
+        numRatings: S.maybeToNullable(filmValueExtractor('numRatings')(film)),
+      }));
 
-            let searchResults = body.items || [];
-            const candidates = searchResults.filter(item => item.link.match(/film\d{4,8}\.html/));
-            global.log.info('[CRAWLER] Candidates (%s)', candidates.length);
+      const firstFilm = films[0];
+      global.log.info('[CRAWLER] First film', firstFilm);
 
-            const films = candidates.map(film => ({
-                title: S.maybeToNullable(filmValueExtractor('title')(film)),
-                year: S.maybeToNullable(filmValueExtractor('year')(film)),
-                rating: S.maybeToNullable(filmValueExtractor('rating')(film)),
-                numRatings: S.maybeToNullable(filmValueExtractor('numRatings')(film)),
-            }));
+      return firstFilm;
 
-            const firstFilm = films[0];
-            global.log.info('[CRAWLER] First film', firstFilm);
-            callback(firstFilm);
-        }
+    })
+    .catch(function (error) {
+
+      global.log.error('Some error happened with request: ', error);
+      if (response && response.statusCode) {
+        global.log.error(response.statusCode + "\n");
+      }
+
     });
+};
+
+const buildFilmSearchRequest = function (filmQuery) {
+  const baseUri = interpolate(global.parameters.movie_review_source_url, global.secrets.google_customsearch_api);
+  const targetUri = UriBuilder.updateQuery(baseUri, {q: filmQuery});
+  const timeout = global.parameters.source_timeout_in_millis;
+  return {
+    method: 'GET',
+    json: true,
+    uri: targetUri,
+    timeout: timeout,
+    headers: {'User-Agent': useragent.getRandom()}
+  }
+};
+
+const filmValueExtractor = function (field) {
+  switch (field) {
+    case "title":
+      return S.pipe([
+        S.gets(S.is($.String))(['pagemap', 'movie', '0', 'name'])
+      ]);
+    case "year":
+      return S.pipe([
+        S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'movie', '0', 'datepublished']),
+        S.chain(iff(S.is($.String))(S.parseInt(10))),
+      ]);
+    case "rating":
+      const parseFloat = S.pipe([rating => rating.replace(',', '.'), S.parseFloat]);
+      return S.pipe([
+        S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'moviereview', '0', 'originalrating']),
+        S.chain(iff(S.is($.String))(parseFloat)),
+      ]);
+    case "numRatings":
+      return S.pipe([
+        S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'moviereview', '0', 'votes']),
+        S.chain(iff(S.is($.String))(S.parseInt(10))),
+      ]);
+    default:
+      return () => Maybe.Nothing;
+  }
 };
 
 
 module.exports = {
-    searchFilm: callbackToPromise(searchFilm)
+  searchFilm: searchFilm
 };
