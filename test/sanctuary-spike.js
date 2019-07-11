@@ -1,6 +1,7 @@
 const S = require("sanctuary");
 const $ = require("sanctuary-def");
 const type = require('sanctuary-type-identifiers');
+const {or, iff} = require(__dirname + '/../skill/utils.js');
 
 const chai = require('chai');
 const expect = chai.expect;
@@ -14,8 +15,6 @@ chai.use(maybeChai({
 describe("Sanctuary spike", function() {
 
   // System under test
-  const or = (...fns) => a => fns.reduce((r, f) => r || f(a), false);
-  const iff = cond => f => a => cond(a) ? f(a) : S.Just(a);
   const extractVotes = S.pipe([
     S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'moviereview', '0', 'votes']),
     S.chain(iff(S.is($.String))(S.parseInt(10))),

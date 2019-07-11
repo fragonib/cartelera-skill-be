@@ -2,7 +2,7 @@
 // Please visit https://alexa.design/cookbook for additional examples on implementing slots, dialog management,
 // session persistence, api calls, and more.
 const Alexa = require('ask-sdk-core');
-const rater = require(__dirname + '/ranker.js');
+const ranker = require(__dirname + '/ranker.js');
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -40,7 +40,7 @@ const MovieRankingHandler = {
     },
     async handle(handlerInput) {
         const movieName = handlerInput.requestEnvelope.request.intent.slots.movie.value;
-        const speechText = await rater.rateMovie(movieName);
+        const speechText = await ranker.rateMovie(movieName);
 
         return handlerInput.responseBuilder
             .speak(speechText)

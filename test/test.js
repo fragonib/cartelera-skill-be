@@ -10,15 +10,15 @@ chai.use(chaiXml);
 const deindent = require('deindent');
 
 
-describe("Movie rater", function() {
+describe("Movie ranker", function() {
 
-    const rater = require(__dirname + '/../skill/ranker.js');
+    const ranker = require(__dirname + '/../skill/ranker.js');
 
     it('should vocalize a full movie review', function() {
 
         const movieName = 'matrix';
 
-        const result = rater.rateMovie(movieName);
+        const result = ranker.rateMovie(movieName);
 
         return result.then(function(speech) {
             expect(speech).xml.to.equal(deindent(`
@@ -35,7 +35,7 @@ describe("Movie rater", function() {
 
         const movieName = 'unexistent movie';
 
-        const result = rater.rateMovie(movieName);
+        const result = ranker.rateMovie(movieName);
 
         return result.then(function(speech) {
             expect(speech).xml.to.equal(

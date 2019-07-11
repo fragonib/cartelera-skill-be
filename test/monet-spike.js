@@ -11,6 +11,7 @@ chai.use(maybeChai({
 
 describe("Monet spike", function() {
 
+  // System under test
   const Try = callback => {
     try {
       const result = callback();
