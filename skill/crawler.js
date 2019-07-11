@@ -4,17 +4,19 @@ const request = require('request');
 const useragent = require('random-useragent');
 const interpolate = require('es6-template-render');
 const { or, iff, callbackToPromise } = require(__dirname + '/utils.js');
+const { UriBuilder } = require('uribuilder');
+
 
 const buildFilmSearchRequest = function(filmQuery) {
+    const baseUri = interpolate(global.parameters.movie_review_source_url, global.secrets.google_customsearch_api);
+    const targetUri = UriBuilder.updateQuery(baseUri, { q: filmQuery });
+    const timeout = global.parameters.source_timeout_in_millis;
     return {
         method: 'GET',
         json: true,
-        uri: interpolate(global.parameters.movie_review_source_url, global.secrets.google_customsearch_api)
-          + "&q=" + encodeURIComponent(filmQuery),
-        timeout: global.parameters.source_timeout_in_millis,
-        headers: {
-            'User-Agent': useragent.getRandom()
-        }
+        uri: targetUri,
+        timeout: timeout,
+        headers: { 'User-Agent': useragent.getRandom() }
     }
 };
 

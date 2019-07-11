@@ -21,7 +21,8 @@
     "graceful-fs": "^4.1",
     "random-useragent": "^0.3",
     "request": "^2.88",
-    "try-monad": "^0.1.1"
+    "try-monad": "^0.1.1",
+    "uribuilder": "latest"
   },
   "devDependencies": {
     "chai": "^4.2.0",
