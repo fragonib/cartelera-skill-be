@@ -3,7 +3,7 @@ const $ = require("sanctuary-def");
 const request = require('request');
 const useragent = require('random-useragent');
 const interpolate = require('es6-template-render');
-const { or, iff } = require(__dirname + '/utils.js')
+const { or, iff, callbackToPromise } = require(__dirname + '/utils.js');
 
 const buildFilmSearchRequest = function(filmQuery) {
     return {
@@ -78,5 +78,5 @@ const searchFilm = function(filmQuery, callback) {
 
 
 module.exports = {
-    searchFilm: searchFilm
+    searchFilm: callbackToPromise(searchFilm)
 };

@@ -6,18 +6,8 @@ global.log = console;
 global.parameters = JSON.parse(fs.readFileSync('config.json', 'utf-8'));
 global.secrets = JSON.parse(fs.readFileSync('secret.json', 'utf-8'));
 
-const wrap_callback_with_promise = function(callback) {
-    return param => new Promise((resolve) => {
-        callback(param, (result) => {
-            resolve(result);
-        });
-    });
-};
-
-const findFilmPromise = wrap_callback_with_promise(crawler.searchFilm);
-
-const rateFilm = query_string => findFilmPromise(query_string).then((film) => {
-    return film ? vocalize.vocalizeFilm(film) : vocalize.vocalizeFilmNotFound(query_string);
+const rateFilm = queryString => crawler.searchFilm(queryString).then(film => {
+    return film ? vocalize.vocalizeFilm(film) : vocalize.vocalizeFilmNotFound(queryString);
 });
 
 module.exports = {
