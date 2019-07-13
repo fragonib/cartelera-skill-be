@@ -7,7 +7,20 @@ const {UriBuilder} = require('uribuilder');
 const {or} = require(__dirname + '/utils.js');
 
 
-const searchMovie = function (movieQuery) {
+const buildMovieSearchRequest = movieQuery => {
+  const baseUri = resolveTemplate(global.parameters.movie_review_source_url, global.secrets.google_customsearch_api);
+  const targetUri = UriBuilder.updateQuery(baseUri, {q: movieQuery});
+  const timeout = global.parameters.source_timeout_in_millis;
+  return {
+    method: 'GET',
+    json: true,
+    uri: targetUri,
+    timeout: timeout,
+    headers: {'User-Agent': useragent.getRandom()}
+  }
+};
+
+const searchMovie = movieQuery => {
 
   global.log.info('[CRAWLER] Search query: ' + movieQuery);
 
@@ -15,7 +28,7 @@ const searchMovie = function (movieQuery) {
   global.log.info('[HTTP] GET ' + movieRequest.uri);
 
   return rp(movieRequest)
-    .then(function (body) {
+    .then(body => {
 
       const searchResults = body.items || [];
       const hasMovieLink = item => item.link.match(/film\d{4,8}\.html/);
@@ -47,20 +60,7 @@ const searchMovie = function (movieQuery) {
     });
 };
 
-const buildMovieSearchRequest = function (movieQuery) {
-  const baseUri = resolveTemplate(global.parameters.movie_review_source_url, global.secrets.google_customsearch_api);
-  const targetUri = UriBuilder.updateQuery(baseUri, {q: movieQuery});
-  const timeout = global.parameters.source_timeout_in_millis;
-  return {
-    method: 'GET',
-    json: true,
-    uri: targetUri,
-    timeout: timeout,
-    headers: {'User-Agent': useragent.getRandom()}
-  }
-};
-
-const movieValueExtractor = function (name) {
+const movieValueExtractor = name => {
 
   const isString = S.is ($.String);
   const isStringOrNumber = or (isString, S.is ($.Number));

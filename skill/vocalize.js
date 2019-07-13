@@ -1,12 +1,12 @@
 const deindent = require('deindent');
 
-const vocalizeMovieNotFound = function(query) {
+const vocalizeMovieNotFound = query => {
     const speech = `<speak>Lo siento, no he podido encontrar la película "${query}"</speak>`;
     global.log.info("[VOCALIZER]", speech);
     return speech;
 };
 
-const vocalizeMovie = function(movie) {
+const vocalizeMovie = movie => {
     const speech = deindent(`
         <speak>
             ${vocalizeRating(movie)}${vocalizeNumRating(movie)} en <lang xml:lang="en-US">filmaffinity</lang>,
@@ -16,24 +16,24 @@ const vocalizeMovie = function(movie) {
     return speech;
 };
 
-const vocalizeTitle = function(movie) {
+const vocalizeTitle = movie => {
     return `"${movie.title.replace(/[.:]/, ',')}"`;
 };
 
-const vocalizeYear = function(movie) {
+const vocalizeYear = movie => {
     if (movie.year === null)
         return '';
     return `, de <say-as interpret-as="cardinal">${movie.year}</say-as>`;
 };
 
-const vocalizeRating = function(movie) {
+const vocalizeRating = movie => {
     if (movie.rating === null)
         return 'No está disponible';
     let replace = movie.rating.toLocaleString('ES');
     return `<say-as interpret-as="cardinal">${replace}</say-as>`;
 };
 
-const vocalizeNumRating = function(movie) {
+const vocalizeNumRating = movie => {
 
     if (movie.numRatings === null)
         return '';
