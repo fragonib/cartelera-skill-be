@@ -23,10 +23,10 @@ const searchMovie = function (movieQuery) {
       global.log.info('[CRAWLER] Found (%s) movie candidates', candidates.length);
 
       const movies = candidates.map(movie => ({
-        title: S.maybeToNullable(movieValueExtractor('title')(movie)),
-        year: S.maybeToNullable(movieValueExtractor('year')(movie)),
-        rating: S.maybeToNullable(movieValueExtractor('rating')(movie)),
-        numRatings: S.maybeToNullable(movieValueExtractor('numRatings')(movie)),
+        title: S.maybeToNullable (movieValueExtractor ('title') (movie)),
+        year: S.maybeToNullable (movieValueExtractor ('year') (movie)),
+        rating: S.maybeToNullable (movieValueExtractor ('rating') (movie)),
+        numRatings: S.maybeToNullable (movieValueExtractor ('numRatings') (movie)),
       }));
 
       const firstMovie = S.head(movies);
@@ -60,32 +60,42 @@ const buildMovieSearchRequest = function (movieQuery) {
   }
 };
 
-const movieValueExtractor = function (field) {
-  switch (field) {
+const movieValueExtractor = function (name) {
+
+  const isString = S.is ($.String);
+  const isStringOrNumber = or (isString, S.is ($.Number));
+
+  switch (name) {
+
     case "title":
       return S.pipe([
-        S.gets(S.is($.String))(['pagemap', 'movie', '0', 'name'])
+        S.gets (isString) (['pagemap', 'movie', '0', 'name'])
       ]);
+
     case "year":
       return S.pipe([
-        S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'movie', '0', 'datepublished']),
-        S.chain(ifElse(S.is($.String))(S.parseInt(10)(S.Just))),
+        S.gets (isStringOrNumber) (['pagemap', 'movie', '0', 'datepublished']),
+        S.chain (S.ifElse (isString) (S.parseInt(10)) (S.Just)),
       ]);
+
     case "rating":
-      const parseFloat = S.pipe([rating => rating.replace(',', '.'), S.parseFloat]);
+      const parseRating = S.pipe([rating => rating.replace(',', '.'), S.parseFloat]);
       return S.pipe([
-        S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'moviereview', '0', 'originalrating']),
-        S.chain(ifElse(S.is($.String))(parseFloat)(S.Just)),
+        S.gets (isStringOrNumber) (['pagemap', 'moviereview', '0', 'originalrating']),
+        S.chain (S.ifElse (isString) (parseRating) (S.Just)),
       ]);
+
     case "numRatings":
       return S.pipe([
-        S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'moviereview', '0', 'votes']),
-        S.chain(ifElse(S.is($.String))(S.parseInt(10))(S.Just)),
+        S.gets (isStringOrNumber) (['pagemap', 'moviereview', '0', 'votes']),
+        S.chain (S.ifElse (isString) (S.parseInt(10)) (S.Just)),
       ]);
+
     default:
-      const voidExtractor = () => Maybe.Nothing;
+      const voidExtractor = () => S.Nothing;
       return voidExtractor;
   }
+
 };
 
 
