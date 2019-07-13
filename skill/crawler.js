@@ -4,7 +4,7 @@ const rp = require('request-promise');
 const useragent = require('random-useragent');
 const resolveTemplate = require('es6-template-render');
 const {UriBuilder} = require('uribuilder');
-const {or, iff} = require(__dirname + '/utils.js');
+const {or} = require(__dirname + '/utils.js');
 
 
 const searchMovie = function (movieQuery) {
@@ -69,18 +69,18 @@ const movieValueExtractor = function (field) {
     case "year":
       return S.pipe([
         S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'movie', '0', 'datepublished']),
-        S.chain(iff(S.is($.String))(S.parseInt(10))),
+        S.chain(ifElse(S.is($.String))(S.parseInt(10)(S.Just))),
       ]);
     case "rating":
       const parseFloat = S.pipe([rating => rating.replace(',', '.'), S.parseFloat]);
       return S.pipe([
         S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'moviereview', '0', 'originalrating']),
-        S.chain(iff(S.is($.String))(parseFloat)),
+        S.chain(ifElse(S.is($.String))(parseFloat)(S.Just)),
       ]);
     case "numRatings":
       return S.pipe([
         S.gets(or(S.is($.String), S.is($.Number)))(['pagemap', 'moviereview', '0', 'votes']),
-        S.chain(iff(S.is($.String))(S.parseInt(10))),
+        S.chain(ifElse(S.is($.String))(S.parseInt(10))(S.Just)),
       ]);
     default:
       const voidExtractor = () => Maybe.Nothing;
