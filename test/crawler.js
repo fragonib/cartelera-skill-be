@@ -15,6 +15,7 @@ chai.use( maybeChai( {
 const rewire = require('rewire');
 const userRewire = rewire('../skill/crawler');
 const extractCandidates = userRewire.__get__('extractCandidates');
+const extractMovieInfo = userRewire.__get__('extractMovieInfo');
 
 
 describe("Extract candidates from response", () => {
@@ -71,3 +72,99 @@ describe("Extract candidates from response", () => {
   });
 
 });
+
+
+describe("Extract movie info from candidate", () => {
+
+  it('Has NO minimum info', () => {
+    const candidateItem = {
+      pagemap: {
+        movie: [
+          {
+            name: 'Matrix'
+          }
+        ]
+      }
+    };
+    const movieInfo = extractMovieInfo(candidateItem);
+    expect(movieInfo).to.be.nothing();
+  });
+
+  it('Has invalid info', () => {
+    const candidateItem = {
+      pagemap: {
+        movie: [
+          {
+            name: 'Matrix',
+            datepublished: 'wrong'
+          }
+        ],
+        moviereview: [
+          {
+            originalrating: 5,
+            votes: 'wrong'
+          }
+        ]
+      }
+    };
+    const movieInfo = extractMovieInfo(candidateItem);
+    expect(S.fromMaybe ({}) (movieInfo)).to.be.eql({
+      title: 'Matrix',
+      year: null,
+      rating: 5,
+      numRatings: null
+    });
+  });
+
+  it('Has minimum info', () => {
+    const candidateItem = {
+      pagemap: {
+        movie: [
+          {
+            name: 'Matrix'
+          }
+        ],
+        moviereview: [
+          {
+            originalrating: 5
+          }
+        ]
+      }
+    };
+    const movieInfo = extractMovieInfo(candidateItem);
+    expect(S.fromMaybe ({}) (movieInfo)).to.be.eql({
+      title: 'Matrix',
+      year: null,
+      rating: 5,
+      numRatings: null
+    });
+  });
+
+  it('Has full info', () => {
+    const candidateItem = {
+      pagemap: {
+        movie: [
+          {
+            name: 'Matrix',
+            datepublished: 2009
+          }
+        ],
+        moviereview: [
+          {
+            originalrating: 5,
+            votes: 1000
+          }
+        ]
+      }
+    };
+    const movieInfo = extractMovieInfo(candidateItem);
+    expect(S.fromMaybe ({}) (movieInfo)).to.be.eql({
+      title: 'Matrix',
+      year: 2009,
+      rating: 5,
+      numRatings: 1000
+    });
+  });
+
+});
+

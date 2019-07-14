@@ -23,9 +23,9 @@ const searchMovie = movieQuery => {
       global.log.info('[CRAWLER] Found (%s) movie candidates', candidates.length);
 
       const selectedCandidate = S.chain (selectCandidate) (candidates);
-      global.log.info('[CRAWLER] Selected candidate:', selectedCandidate);
+      const movie = S.chain (extractMovieInfo) (selectedCandidate);
 
-      const movie = S.map (buildMovie) (selectedCandidate);
+      global.log.info('[CRAWLER] Selected movie:', movie);
 
       return movie;
 
@@ -70,13 +70,15 @@ const extractCandidates = response => {
 
 const selectCandidate = candidates => S.head(candidates);
 
-const buildMovie = candidate => {
-  return {
+const extractMovieInfo = candidate => {
+  const extractedMovie = {
     title: S.maybeToNullable (movieValueExtractor ('title') (candidate)),
     year: S.maybeToNullable (movieValueExtractor ('year') (candidate)),
     rating: S.maybeToNullable (movieValueExtractor ('rating') (candidate)),
     numRatings: S.maybeToNullable (movieValueExtractor ('numRatings') (candidate)),
   };
+  return (extractedMovie.title === null || extractedMovie.rating === null) ?
+    S.Nothing : S.Just(extractedMovie);
 };
 
 const movieValueExtractor = name => {
