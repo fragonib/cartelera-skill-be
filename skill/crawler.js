@@ -7,6 +7,41 @@ const {UriBuilder} = require('uribuilder');
 const {or} = require(__dirname + '/utils.js');
 
 
+const searchMovie = movieQuery => {
+
+  global.log.info('[CRAWLER] Search query: ' + movieQuery);
+
+  const movieRequest = buildMovieSearchRequest(movieQuery);
+  global.log.info('[HTTP] GET ' + movieRequest.uri);
+
+  return rp(movieRequest)
+    .then(response => {
+
+      global.log.info('[CRAWLER] Extracting candidates');
+
+      const candidates = extractCandidates(response);
+      global.log.info('[CRAWLER] Found (%s) movie candidates', candidates.length);
+
+      const selectedCandidate = S.chain (selectCandidate) (candidates);
+      global.log.info('[CRAWLER] Selected candidate:', selectedCandidate);
+
+      const movie = S.map (buildMovie) (selectedCandidate);
+
+      return movie;
+
+    })
+    .catch(error => {
+
+      global.log.error('[HTTP] Some error happened with request: ', error);
+      if (error.statusCode) {
+        global.log.error('[HTTP] Response code: ' + error.statusCode + "\n");
+      }
+
+      return S.Nothing;
+
+    });
+};
+
 const buildMovieSearchRequest = movieQuery => {
   const baseUri = resolveTemplate(global.parameters.movie_review_source_url, global.secrets.google_customsearch_api);
   const targetUri = UriBuilder.updateQuery(baseUri, {q: movieQuery});
@@ -20,44 +55,30 @@ const buildMovieSearchRequest = movieQuery => {
   }
 };
 
-const searchMovie = movieQuery => {
+const extractCandidates = response => {
+  const extractItems = S.gets (S.is ($.Array ($.Object))) (['items']);
+  const itemHasMovieLink = S.pipe([
+    S.gets (S.is ($.String)) (['link']),
+    S.map (S.test (/film\d{4,8}\.html/)),
+    S.fromMaybe (false)
+  ]);
+  const extractCandidates = S.pipe([
+    extractItems,
+    S.map (S.filter (itemHasMovieLink)),
+  ]);
+  const extractedCandidates = extractCandidates(response);
+  return S.fromMaybe ([]) (extractedCandidates);
+};
 
-  global.log.info('[CRAWLER] Search query: ' + movieQuery);
+const selectCandidate = candidates => S.head(candidates);
 
-  const movieRequest = buildMovieSearchRequest(movieQuery);
-  global.log.info('[HTTP] GET ' + movieRequest.uri);
-
-  return rp(movieRequest)
-    .then(body => {
-
-      const searchResults = body.items || [];
-      const hasMovieLink = item => item.link.match(/film\d{4,8}\.html/);
-      const candidates = searchResults.filter(hasMovieLink);
-      global.log.info('[CRAWLER] Found (%s) movie candidates', candidates.length);
-
-      const movies = candidates.map(movie => ({
-        title: S.maybeToNullable (movieValueExtractor ('title') (movie)),
-        year: S.maybeToNullable (movieValueExtractor ('year') (movie)),
-        rating: S.maybeToNullable (movieValueExtractor ('rating') (movie)),
-        numRatings: S.maybeToNullable (movieValueExtractor ('numRatings') (movie)),
-      }));
-
-      const firstMovie = S.head(movies);
-      global.log.info('[CRAWLER] First movie candidate:', firstMovie);
-
-      return firstMovie;
-
-    })
-    .catch(function (error) {
-
-      global.log.error('[HTTP] Some error happened with request: ', error);
-      if (error.statusCode) {
-        global.log.error('[HTTP] Response code: ' + error.statusCode + "\n");
-      }
-
-      return S.Nothing;
-
-    });
+const buildMovie = candidate => {
+  return {
+    title: S.maybeToNullable (movieValueExtractor ('title') (candidate)),
+    year: S.maybeToNullable (movieValueExtractor ('year') (candidate)),
+    rating: S.maybeToNullable (movieValueExtractor ('rating') (candidate)),
+    numRatings: S.maybeToNullable (movieValueExtractor ('numRatings') (candidate)),
+  };
 };
 
 const movieValueExtractor = name => {
@@ -92,7 +113,7 @@ const movieValueExtractor = name => {
       ]);
 
     default:
-      const voidExtractor = () => S.Nothing;
+      const voidExtractor = movie => S.Nothing;
       return voidExtractor;
   }
 
