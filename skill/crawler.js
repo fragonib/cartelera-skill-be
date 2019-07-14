@@ -56,18 +56,16 @@ const buildMovieSearchRequest = movieQuery => {
 };
 
 const extractCandidates = response => {
-  const extractItems = S.gets (S.is ($.Array ($.Object))) (['items']);
   const itemHasMovieLink = S.pipe([
     S.gets (S.is ($.String)) (['link']),
     S.map (S.test (/film\d{4,8}\.html/)),
     S.fromMaybe (false)
   ]);
   const extractCandidates = S.pipe([
-    extractItems,
+    S.gets(S.is ($.Array ($.Object))) (['items']),
     S.map (S.filter (itemHasMovieLink)),
   ]);
-  const extractedCandidates = extractCandidates(response);
-  return S.fromMaybe ([]) (extractedCandidates);
+  return extractCandidates(response);
 };
 
 const selectCandidate = candidates => S.head(candidates);
