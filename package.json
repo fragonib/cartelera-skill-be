@@ -4,7 +4,8 @@
   "description": "Gets a film ranking from filmaffinity.com",
   "main": "skill/intent.js",
   "scripts": {
-    "test": "mocha test/ranker.js"
+    "test": "mocha test",
+    "spike": "mocha spike"
   },
   "author": "fragonib",
   "license": "MIT",
