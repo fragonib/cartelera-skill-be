@@ -19,12 +19,10 @@ const searchMovie = movieQuery => {
 
       global.log.info('[CRAWLER] Extracting candidates from response');
       const optionalListOfCandidates = extractCandidates(response);
-
       const candidateNumber = S.fromMaybe ([]) (optionalListOfCandidates).length;
       global.log.info('[CRAWLER] Found (%s) movie candidates', candidateNumber);
 
       const optionalSelectedCandidate = S.chain (selectCandidate) (optionalListOfCandidates);
-
       const optionalMovie = S.chain (extractMovieInfo) (optionalSelectedCandidate);
       global.log.info('[CRAWLER] Selected movie:', optionalMovie);
 
