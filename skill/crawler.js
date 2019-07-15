@@ -17,17 +17,18 @@ const searchMovie = movieQuery => {
   return rp(movieRequest)
     .then(response => {
 
-      global.log.info('[CRAWLER] Extracting candidates');
+      global.log.info('[CRAWLER] Extracting candidates from response');
+      const optionalListOfCandidates = extractCandidates(response);
 
-      const candidates = extractCandidates(response);
-      global.log.info('[CRAWLER] Found (%s) movie candidates', candidates.length);
+      const candidateNumber = S.fromMaybe ([]) (optionalListOfCandidates).length;
+      global.log.info('[CRAWLER] Found (%s) movie candidates', candidateNumber);
 
-      const selectedCandidate = S.chain (selectCandidate) (candidates);
-      const movie = S.chain (extractMovieInfo) (selectedCandidate);
+      const optionalSelectedCandidate = S.chain (selectCandidate) (optionalListOfCandidates);
 
-      global.log.info('[CRAWLER] Selected movie:', movie);
+      const optionalMovie = S.chain (extractMovieInfo) (optionalSelectedCandidate);
+      global.log.info('[CRAWLER] Selected movie:', optionalMovie);
 
-      return movie;
+      return optionalMovie;
 
     })
     .catch(error => {
@@ -37,7 +38,8 @@ const searchMovie = movieQuery => {
         global.log.error('[HTTP] Response code: ' + error.statusCode + "\n");
       }
 
-      return S.Nothing;
+      const noMovie = S.Nothing;
+      return noMovie;
 
     });
 };
