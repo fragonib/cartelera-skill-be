@@ -27,7 +27,7 @@ describe("Extract candidates from response", () => {
       ]
     };
     const candidates = extractCandidates(response);
-    expect(candidates).to.be.nothing;
+    expect(candidates).to.be.nothing();
   });
 
   it('No well formed items', () => {
@@ -35,7 +35,7 @@ describe("Extract candidates from response", () => {
       items: { link: 'http://a.b.c/film349394.html', other: 'any value' }
     };
     const candidates = extractCandidates(response);
-    expect(candidates).to.be.nothing;
+    expect(candidates).to.be.nothing();
   });
 
   it('Items well formed, but empty', () => {
@@ -43,7 +43,7 @@ describe("Extract candidates from response", () => {
       items: []
     };
     const candidates = extractCandidates(response);
-    expect(S.maybeToNullable(candidates)).to.be.eql([]);
+    expect(candidates).to.be.just([]);
   });
 
   it('Items well formed, but any is a candidate', () => {
@@ -54,7 +54,7 @@ describe("Extract candidates from response", () => {
       ]
     };
     const candidates = extractCandidates(response);
-    expect(S.maybeToNullable(candidates)).to.be.eql([]);
+    expect(candidates).to.be.just([]);
   });
 
   it('Items well formed with few candidates', () => {
@@ -66,7 +66,7 @@ describe("Extract candidates from response", () => {
       ]
     };
     const candidates = extractCandidates(response);
-    expect(S.maybeToNullable(candidates)).to.be.eql([
+    expect(candidates).to.be.just([
         { link: 'http://a.b.c/film349394.html', other: 'any value' }
       ]);
   });
@@ -108,7 +108,7 @@ describe("Extract movie info from candidate", () => {
       }
     };
     const movieInfo = extractMovieInfo(candidateItem);
-    expect(S.fromMaybe ({}) (movieInfo)).to.be.eql({
+    expect(movieInfo).to.be.just({
       title: 'Matrix',
       year: null,
       rating: 5,
@@ -132,7 +132,7 @@ describe("Extract movie info from candidate", () => {
       }
     };
     const movieInfo = extractMovieInfo(candidateItem);
-    expect(S.fromMaybe ({}) (movieInfo)).to.be.eql({
+    expect(movieInfo).to.be.just({
       title: 'Matrix',
       year: null,
       rating: 5,
@@ -158,7 +158,7 @@ describe("Extract movie info from candidate", () => {
       }
     };
     const movieInfo = extractMovieInfo(candidateItem);
-    expect(S.fromMaybe ({}) (movieInfo)).to.be.eql({
+    expect(movieInfo).to.be.just({
       title: 'Matrix',
       year: 2009,
       rating: 5,
