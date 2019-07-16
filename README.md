@@ -15,7 +15,7 @@ Finally, to run this piece of code you have to use [Node.js](https://nodejs.org)
     npm install
     ```
 
-2. Run it!
+2. Run tests
     ```
     node test
     ```
