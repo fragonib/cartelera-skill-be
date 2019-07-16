@@ -1,8 +1,8 @@
 # What is this?
 
-This is an alexa skill backend for getting a rank for a given movie. 
+This is an alexa skill backend to get a rank for a given movie. 
 
-# What do you need
+# What do you need?
 
 Right know retrieves the movie reviews from Filmaffinity.com and return Alexa speeches in spanish language. 
 
