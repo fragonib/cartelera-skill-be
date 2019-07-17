@@ -1,63 +1,47 @@
 const deindent = require('deindent');
+const number = require(__dirname + '/number.js');
 
 const vocalizeMovieNotFound = query => {
-    const speech = `<speak>Lo siento, no he podido encontrar la película "${query}"</speak>`;
-    global.log.info("[VOCALIZER]", speech);
-    return speech;
+  const speech = `<speak>Lo siento, no he podido encontrar la película "${query}"</speak>`;
+  global.log.info("[VOCALIZER]", speech);
+  return speech;
 };
 
 const vocalizeMovie = movie => {
-    const speech = deindent(`
+  const speech = deindent(`
         <speak>
             ${vocalizeRating(movie)}${vocalizeNumRating(movie)} en <lang xml:lang="en-US">filmaffinity</lang>,
             para ${vocalizeTitle(movie)}${vocalizeYear(movie)}.
         </speak>`);
-    global.log.info("[VOCALIZER]", speech);
-    return speech;
+  global.log.info("[VOCALIZER]", speech);
+  return speech;
 };
 
 const vocalizeTitle = movie => {
-    return `"${movie.title.replace(/[.:]/, ',')}"`;
+  return `"${movie.title.replace(/[.:]/, ',')}"`;
 };
 
 const vocalizeYear = movie => {
-    if (movie.year === null)
-        return '';
-    return `, de <say-as interpret-as="cardinal">${movie.year}</say-as>`;
+  if (movie.year === null)
+    return '';
+  return `, de <say-as interpret-as="cardinal">${movie.year}</say-as>`;
 };
 
 const vocalizeRating = movie => {
-    if (movie.rating === null)
-        return 'No está disponible';
-    let replace = movie.rating.toLocaleString('ES');
-    return `<say-as interpret-as="cardinal">${replace}</say-as>`;
+  if (movie.rating === null)
+    return 'No está disponible';
+  const replace = movie.rating.toLocaleString('ES');
+  return `<say-as interpret-as="cardinal">${replace}</say-as>`;
 };
 
 const vocalizeNumRating = movie => {
-
-    if (movie.numRatings === null)
-        return '';
-
-    const numberString = String(movie.numRatings);
-    const numberLength = numberString.length;
-    const bigNumberLength = [ 0, 4, 6 ];
-    const bigNumUnit = [ 0, 2, 3 ];
-
-    let thresholdLength;
-    for (let i = 0; i < bigNumberLength.length; i++) {
-        const _length = bigNumberLength[i];
-        if (numberLength >= _length) {
-            thresholdLength = _length;
-        }
-    }
-    const roundPositions = bigNumUnit[bigNumberLength.indexOf(thresholdLength)];
-    const head = roundPositions > 0 ? numberString.slice(0, -1 * roundPositions) : numberString;
-    const tail = '0'.repeat(roundPositions);
-
-    return ` con <say-as interpret-as="cardinal">${head}${tail}</say-as> votos`;
+  if (movie.numRatings === null)
+    return '';
+  const roundedNumber = number.onlySignificantFigures(String(movie.numRatings));
+  return ` con <say-as interpret-as="cardinal">${roundedNumber}</say-as> votos`;
 };
 
 module.exports = {
-    vocalizeMovie : vocalizeMovie,
-    vocalizeNoMovieFound : vocalizeMovieNotFound,
+  vocalizeMovie: vocalizeMovie,
+  vocalizeNoMovieFound: vocalizeMovieNotFound,
 };

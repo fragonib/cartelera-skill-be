@@ -4,7 +4,6 @@ const rp = require('request-promise');
 const useragent = require('random-useragent');
 const resolveTemplate = require('es6-template-render');
 const {UriBuilder} = require('uribuilder');
-const {or} = require(__dirname + '/utils.js');
 
 
 const searchMovie = movieQuery => {
@@ -83,6 +82,7 @@ const extractMovieInfo = candidate => {
 
 const movieValueExtractor = name => {
 
+  const or = (...fns) => a => fns.reduce((r, f) => r || f(a), false);
   const isString = S.is ($.String);
   const isStringOrNumber = or (isString, S.is ($.Number));
 
