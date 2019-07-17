@@ -9,7 +9,7 @@ chai.use(maybeChai({
 }));
 
 
-describe("Monet spike", function() {
+describe("Secure rating extraction using Monet", () => {
 
   // System under test
   const Try = callback => {
@@ -22,43 +22,43 @@ describe("Monet spike", function() {
   };
 
   const extractVotes = movie =>
-    Try(() => movie.pagemap.moviereview[0].votes)
+    Try(() => movie.pagemap.moviereview[0].rating)
       .toMaybe()
       .map(parseInt)
       .filterNot(isNaN);
 
-  it('root node is wrong', function() {
-    const movie = { wrong: { moviereview: [ { votes: 5 } ] } };
+  it('root node is wrong', () => {
+    const movie = { wrong: { moviereview: [ { rating: 5 } ] } };
     const result = extractVotes(movie);
     expect(result).to.be.nothing();
   });
 
-  it('list node is empty', function() {
+  it('list node is empty', () => {
     const movie = { pagemap: { moviereview: [] } };
     const result = extractVotes(movie);
     expect(result).to.be.nothing();
   });
 
-  it('leaf node is wrong', function() {
+  it('leaf node is wrong', () => {
     const movie = { pagemap: { moviereview: [ { wrong: 5 } ] } };
     const result = extractVotes(movie);
     expect(result).to.be.nothing();
   });
 
-  it('leaf node is number', function() {
-    const movie = { pagemap: { moviereview: [ { votes: 5 } ] } };
+  it('leaf node is number', () => {
+    const movie = { pagemap: { moviereview: [ { rating: 5 } ] } };
     const result = extractVotes(movie);
     expect(result).to.be.just(5);
   });
 
-  it('leaf node is valid string', function() {
-    const movie = { pagemap: { moviereview: [ { votes: "5" } ] } };
+  it('leaf node is valid string', () => {
+    const movie = { pagemap: { moviereview: [ { rating: "5" } ] } };
     const result = extractVotes(movie);
     expect(result).to.be.just(5);
   });
 
-  it('leaf node is invalid string', function() {
-    const movie = { pagemap: { moviereview: [ { votes: "a" } ] } };
+  it('leaf node is invalid string', () => {
+    const movie = { pagemap: { moviereview: [ { rating: "a" } ] } };
     const result = extractVotes(movie);
     expect(result).to.be.nothing();
   });

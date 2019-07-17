@@ -1,7 +1,6 @@
 const S = require("sanctuary");
 const $ = require("sanctuary-def");
 const type = require('sanctuary-type-identifiers');
-const {or, iff} = require(__dirname + '/../skill/utils.js');
 
 const chai = require('chai');
 const expect = chai.expect;
@@ -12,47 +11,48 @@ chai.use(maybeChai({
 }));
 
 
-describe("Sanctuary spike", function() {
+describe("Secure rating extraction using Sanctuary", () => {
 
   // System under test
+  const or = (...fns) => a => fns.reduce((r, f) => r || f(a), false);
   const extractVotes = S.pipe([
-    S.gets (or (S.is($.String), S.is($.Number))) (['pagemap', 'moviereview', '0', 'votes']),
+    S.gets (or (S.is($.String), S.is($.Number))) (['pagemap', 'moviereview', '0', 'rating']),
     S.chain (S.ifElse (S.is($.String)) (S.parseInt(10)) (S.Just)),
   ]);
 
+  // Tests
+  it('happy path', () =>  {
+    const movie = { pagemap: { moviereview: [ { rating: 5 } ] } };
+    const votes = extractVotes(movie);
+    expect(votes).to.be.just(5);
+  });
 
-  it('root node is wrong', function() {
-    const movie = { wrong: { moviereview: [ { votes: 5 } ] } };
+  it('root node is not present', () =>  {
+    const movie = { wrong: { moviereview: [ { rating: 5 } ] } };
     const votes = extractVotes(movie);
     expect(votes).to.be.nothing();
   });
 
-  it('list node is empty', function() {
+  it('list node is not present', () =>  {
     const movie = { pagemap: { moviereview: {} } };
     const votes = extractVotes(movie);
     expect(votes).to.be.nothing();
   });
 
-  it('leaf node is wrong', function() {
+  it('leaf node is not present', () =>  {
     const movie = { pagemap: { moviereview: [ { wrong: 5 } ] } };
     const votes = extractVotes(movie);
     expect(votes).to.be.nothing();
   });
 
-  it('leaf node is number', function() {
-    const movie = { pagemap: { moviereview: [ { votes: 5 } ] } };
+  it('leaf node is valid numerical string', () =>  {
+    const movie = { pagemap: { moviereview: [ { rating: "5" } ] } };
     const votes = extractVotes(movie);
     expect(votes).to.be.just(5);
   });
 
-  it('leaf node is valid string', function() {
-    const movie = { pagemap: { moviereview: [ { votes: "5" } ] } };
-    const votes = extractVotes(movie);
-    expect(votes).to.be.just(5);
-  });
-
-  it('leaf node is invalid string', function() {
-    const movie = { pagemap: { moviereview: [ { votes: "a" } ] } };
+  it('leaf node is invalid numerical string', () =>  {
+    const movie = { pagemap: { moviereview: [ { rating: "a" } ] } };
     const votes = extractVotes(movie);
     expect(votes).to.be.nothing();
   });
