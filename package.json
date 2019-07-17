@@ -8,7 +8,7 @@
     "spike": "mocha spike"
   },
   "author": "fragonib",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "homepage": "http://www.github.com/fragonib",
   "repository": {
     "type": "git",
@@ -16,13 +16,13 @@
   },
   "dependencies": {
     "ask-sdk-core": "latest",
-    "cheerio": "^0.20",
+    "ask-sdk-model": "latest",
     "deindent": "^0.1.0",
     "es6-template-render": "^1.3.1",
-    "graceful-fs": "^4.1",
-    "random-useragent": "^0.3",
+    "request": "^2.34",
     "request-promise": "^4.2.4",
-    "try-monad": "^0.1.1",
+    "request-promise-core": "^1.1.2",
+    "random-useragent": "^0.3",
     "uribuilder": "latest"
   },
   "devDependencies": {
@@ -33,7 +33,7 @@
     "mocha": "^6.1.4",
     "monet": "^0.9.0",
     "rewire": "latest",
-    "sanctuary": "^2.0.0",
+    "sanctuary": "latest",
     "sanctuary-def": "latest",
     "sanctuary-maybe": "latest",
     "sanctuary-type-identifiers": "latest",
