@@ -1,5 +1,5 @@
 const deindent = require('deindent');
-const number = require(__dirname + '/number.js');
+const number = require('./number.js');
 
 const vocalizeMovieNotFound = query => {
   const speech = `<speak>Lo siento, no he podido encontrar la película "${query}"</speak>`;

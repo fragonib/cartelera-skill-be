@@ -47,10 +47,10 @@ const buildMovieSearchRequest = movieQuery => {
   const timeout = global.parameters.source_timeout_in_millis;
   return {
     method: 'GET',
-    json: true,
     uri: targetUri,
+    headers: {'User-Agent': useragent.getRandom()},
     timeout: timeout,
-    headers: {'User-Agent': useragent.getRandom()}
+    json: true
   }
 };
 

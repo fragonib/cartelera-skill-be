@@ -13,9 +13,9 @@ chai.use( maybeChai( {
 
 // Using rewire to get into Crawler private resources
 const rewire = require('rewire');
-const userRewire = rewire('../skill/crawler');
-const extractCandidates = userRewire.__get__('extractCandidates');
-const extractMovieInfo = userRewire.__get__('extractMovieInfo');
+const crawlerModuleRewire = rewire('../skill/crawler');
+const extractCandidates = crawlerModuleRewire.__get__('extractCandidates');
+const extractMovieInfo = crawlerModuleRewire.__get__('extractMovieInfo');
 
 
 describe("Extract candidates from response", () => {
