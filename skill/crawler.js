@@ -42,9 +42,9 @@ const searchMovie = movieQuery => {
 };
 
 const buildMovieSearchRequest = movieQuery => {
-  const baseUri = resolveTemplate(global.parameters.movie_review_source_url, global.secrets.google_customsearch_api);
+  const baseUri = resolveTemplate(global.config.movie_review_source_url, global.secrets.google_customsearch_api);
   const targetUri = UriBuilder.updateQuery(baseUri, {q: movieQuery});
-  const timeout = global.parameters.source_timeout_in_millis;
+  const timeout = global.config.source_timeout_in_millis;
   return {
     method: 'GET',
     uri: targetUri,
