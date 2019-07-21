@@ -5,58 +5,73 @@ const Alexa = require('ask-sdk-core');
 const ranker = require(__dirname + '/ranker.js');
 
 const LaunchRequestHandler = {
-    canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === 'LaunchRequest' ||
-            (handlerInput.requestEnvelope.request.type === 'IntentRequest' &&
-                handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent');
-    },
-    handle(handlerInput) {
-        const speechText = '¡Hola! Puedes pedir la valoración de una película. ¿Cuál deseas conocer?';
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
+  },
+  handle(handlerInput) {
+    const speechText = '¡Bienvenido a cartelera! ¿Qué necesitas?';
 
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(speechText)
-            .getResponse();
-    }
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .reprompt(speechText)
+      .getResponse();
+  }
 };
+
+const HelpRequestHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest' &&
+      handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent';
+  },
+  handle(handlerInput) {
+    const speechText = 'Puedes pedir la valoración de series o películas.';
+
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .reprompt(speechText)
+      .getResponse();
+  }
+};
+
 const CancelAndStopIntentHandler = {
-    canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.CancelIntent'
-                || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
-    },
-    handle(handlerInput) {
-        const speechText = '¡Adiós!';
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && (handlerInput.requestEnvelope.request.intent.name === 'AMAZON.CancelIntent'
+        || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
+  },
+  handle(handlerInput) {
+    const speechText = '¡Adiós!';
 
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            .getResponse();
-    }
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .getResponse();
+  }
 };
-const MovieRankingHandler = {
-    canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'MovieRankingIntent';
-    },
-    async handle(handlerInput) {
-        const movieName = handlerInput.requestEnvelope.request.intent.slots.movie.value;
-        const speechText = await ranker.rateMovie(movieName);
 
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            .getResponse();
-    },
+const ShowRankingHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'ShowRankingIntent';
+  },
+  async handle(handlerInput) {
+    const showName = handlerInput.requestEnvelope.request.intent.slots.show.value;
+    const speechText = await ranker.rateFilm(showName);
+
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .getResponse();
+  },
 };
 const SessionEndedRequestHandler = {
-    canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
-    },
-    handle(handlerInput) {
-        if (null !== handlerInput.requestEnvelope.request.error) {
-            console.log(JSON.stringify(handlerInput.requestEnvelope.request.error));
-        }
-        return handlerInput.responseBuilder.getResponse();
-    },
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
+  },
+  handle(handlerInput) {
+    if (null !== handlerInput.requestEnvelope.request.error) {
+      console.log(JSON.stringify(handlerInput.requestEnvelope.request.error));
+    }
+    return handlerInput.responseBuilder.getResponse();
+  },
 };
 
 // The intent reflector is used for interaction model testing and debugging.
@@ -64,18 +79,18 @@ const SessionEndedRequestHandler = {
 // for your intents by defining them above, then also adding them to the request
 // handler chain below.
 const IntentReflectorHandler = {
-    canHandle(handlerInput) {
-        return handlerInput.requestEnvelope.request.type === 'IntentRequest';
-    },
-    handle(handlerInput) {
-        const intentName = handlerInput.requestEnvelope.request.intent.name;
-        const speechText = `Tu intención es ${intentName}`;
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest';
+  },
+  handle(handlerInput) {
+    const intentName = handlerInput.requestEnvelope.request.intent.name;
+    const speechText = `Tu intención es ${intentName}`;
 
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
-            .getResponse();
-    }
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
+      .getResponse();
+  }
 
 };
 
@@ -83,30 +98,31 @@ const IntentReflectorHandler = {
 // stating the request handler chain is not found, you have not implemented a handler for
 // the intent being invoked or included it in the skill builder below.
 const ErrorHandler = {
-    canHandle() {
-        return true;
-    },
-    handle(handlerInput, error) {
-        console.log(`~~~~ Error handled: ${error.message}`);
-        const speechText = `Lo siento, no he podido entenderte, inténtalo de nuevo.`;
+  canHandle() {
+    return true;
+  },
+  handle(handlerInput, error) {
+    console.log(`~~~~ Error handled: ${error.message}`);
+    const speechText = `Lo siento, no he podido entenderte, inténtalo de nuevo.`;
 
-        return handlerInput.responseBuilder
-            .speak(speechText)
-            .reprompt(speechText)
-            .getResponse();
-    }
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .reprompt(speechText)
+      .getResponse();
+  }
 };
 
 // This handler acts as the entry point for your skill, routing all request and response
 // payloads to the handlers above. Make sure any new handlers or interceptors you've
 // defined are included below. The order matters - they're processed top to bottom.
 exports.handler = Alexa.SkillBuilders.custom()
-    .addRequestHandlers(
-        MovieRankingHandler,
-        LaunchRequestHandler,
-        CancelAndStopIntentHandler,
-        SessionEndedRequestHandler,
-        IntentReflectorHandler) // make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
-    .addErrorHandlers(
-        ErrorHandler)
-    .lambda();
+  .addRequestHandlers(
+    ShowRankingHandler,
+    HelpRequestHandler,
+    LaunchRequestHandler,
+    CancelAndStopIntentHandler,
+    SessionEndedRequestHandler,
+    IntentReflectorHandler) // make sure IntentReflectorHandler is last so it doesn't override your custom intent handlers
+  .addErrorHandlers(
+    ErrorHandler)
+  .lambda();
