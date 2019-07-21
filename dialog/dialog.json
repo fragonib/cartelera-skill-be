@@ -136,7 +136,7 @@
         "variations": [
           {
             "type": "PlainText",
-            "value": "¿de qué {showType} ?"
+            "value": "¿de qué {showType}?"
           },
           {
             "type": "PlainText",
