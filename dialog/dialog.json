@@ -1,0 +1,149 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "cartelera",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": [
+            "nada"
+          ]
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": [
+            "qué puedo hacer",
+            "no lo sé",
+            "dime qué puedo hacer",
+            "ayuda"
+          ]
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": [
+            "adios",
+            "salir",
+            "para"
+          ]
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "ShowRankingIntent",
+          "slots": [
+            {
+              "name": "show",
+              "type": "AMAZON.Movie",
+              "samples": [
+                "del {show}",
+                "de la {showType} del {show}",
+                "de la {showType} de {show}",
+                "{show}",
+                "de la {showType} {show}",
+                "de {show}"
+              ]
+            },
+            {
+              "name": "showType",
+              "type": "showType"
+            }
+          ],
+          "samples": [
+            "otra nota",
+            "la nota de la {showType} de {show}",
+            "la nota de la {showType} {show}",
+            "la nota de una {showType}",
+            "la {showType} del {show}",
+            "la {showType} de {show}",
+            "la {showType} {show}",
+            "otra {showType}",
+            "otra puntación",
+            "otra valoración",
+            "dime la puntación de la {showType} {show}",
+            "quiero valorar una {showType}",
+            "valorar una {showType}",
+            "una puntuación",
+            "una valoración",
+            "la valoración de la {showType} {show}",
+            "la puntuación de una {showType}",
+            "la valoración de una {showType}",
+            "la puntuación de {show}",
+            "la valoración de {show}"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "name": "showType",
+          "values": [
+            {
+              "id": "FILM",
+              "name": {
+                "value": "película",
+                "synonyms": [
+                  "peli"
+                ]
+              }
+            },
+            {
+              "id": "SERIES",
+              "name": {
+                "value": "serie",
+                "synonyms": [
+                  "serie de televisión",
+                  "serie de tv"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "ShowRankingIntent",
+          "delegationStrategy": "ALWAYS",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "show",
+              "type": "AMAZON.Movie",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Slot.710454353964.1323920450498"
+              }
+            },
+            {
+              "name": "showType",
+              "type": "showType",
+              "confirmationRequired": false,
+              "elicitationRequired": false,
+              "prompts": {}
+            }
+          ]
+        }
+      ],
+      "delegationStrategy": "ALWAYS"
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Slot.710454353964.1323920450498",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "¿de qué {showType} ?"
+          },
+          {
+            "type": "PlainText",
+            "value": "¿De qué película o serie?"
+          }
+        ]
+      }
+    ]
+  }
+}
