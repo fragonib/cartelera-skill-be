@@ -1,5 +1,5 @@
-const S = require("sanctuary");
-const $ = require("sanctuary-def");
+const S = require('sanctuary');
+const $ = require('sanctuary-def');
 const rp = require('request-promise');
 const useragent = require('random-useragent');
 const resolveTemplate = require('es6-template-render');

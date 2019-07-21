@@ -1,5 +1,5 @@
-const S = require("sanctuary");
-const $ = require("sanctuary-def");
+const S = require('sanctuary');
+const $ = require('sanctuary-def');
 const type = require('sanctuary-type-identifiers');
 
 const chai = require('chai');

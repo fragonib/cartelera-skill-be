@@ -2,7 +2,7 @@
 // Please visit https://alexa.design/cookbook for additional examples on implementing slots, dialog management,
 // session persistence, api calls, and more.
 const Alexa = require('ask-sdk-core');
-const ranker = require('./ranker.js');
+const ranker = require(__dirname + '/ranker.js');
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {

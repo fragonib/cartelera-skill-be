@@ -1,5 +1,5 @@
 // Import Sanctuary
-const S = require("sanctuary");
+const S = require('sanctuary');
 const type = require('sanctuary-type-identifiers');
 
 // Configure chai to deal with Sanctuary maybes

@@ -1,4 +1,4 @@
-const { Right, Left, Maybe } = require("monet");
+const { Right, Left, Maybe } = require('monet");
 
 const chai = require('chai');
 const expect = chai.expect;

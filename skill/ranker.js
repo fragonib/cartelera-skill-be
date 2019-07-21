@@ -1,7 +1,7 @@
-const S = require("sanctuary");
+const S = require('sanctuary');
 const fs = require('graceful-fs');
-const crawler = require('./crawler.js');
-const vocalizer = require('./vocalize.js');
+const crawler = require(__dirname + '/crawler.js');
+const vocalizer = require(__dirname + '/vocalize.js');
 
 global.log = console;
 global.config = JSON.parse(fs.readFileSync(__dirname + '/../config.json', 'utf-8'));
