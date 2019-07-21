@@ -23,7 +23,11 @@
     "request-promise": "^4.2.4",
     "request-promise-core": "^1.1.2",
     "random-useragent": "^0.3",
-    "uribuilder": "latest"
+    "uribuilder": "latest",
+    "sanctuary": "latest",
+    "sanctuary-def": "latest",
+    "sanctuary-maybe": "latest",
+    "sanctuary-type-identifiers": "latest"
   },
   "devDependencies": {
     "chai": "^4.2.0",
@@ -33,10 +37,6 @@
     "mocha": "^6.1.4",
     "monet": "^0.9.0",
     "rewire": "latest",
-    "sanctuary": "latest",
-    "sanctuary-def": "latest",
-    "sanctuary-maybe": "latest",
-    "sanctuary-type-identifiers": "latest",
     "sinon": "^7.3.2",
     "sinon-as-promised": "^4.0.3"
   }
