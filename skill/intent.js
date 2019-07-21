@@ -55,13 +55,14 @@ const ShowRankingHandler = {
   },
   async handle(handlerInput) {
     const showName = handlerInput.requestEnvelope.request.intent.slots.show.value;
-    const speechText = await ranker.rateFilm(showName);
+    const speechText = await ranker.rateMovie(showName);
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .getResponse();
   },
 };
+
 const SessionEndedRequestHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
