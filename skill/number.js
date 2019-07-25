@@ -1,27 +1,28 @@
-function insignificantFigures(numberLength) {
+const insignificantFigures = integerString => {
 
-  const figuresCountLowerThreshold = [0, 4, 6];
-  const figuresToRemove = [0, 2, 3];
+  const integerLength = integerString.length;
 
-  let thresholdLength;
-  for (let i = 0; i < figuresCountLowerThreshold.length; i++) {
-    const figuresThreshold = figuresCountLowerThreshold[i];
-    if (numberLength >= figuresThreshold) {
-      thresholdLength = figuresThreshold;
-    }
-  }
+  const closedLowerBoundFiguresNumber = [0, 4, 5];
+  const lessSignificantFiguresToRemove = [0, 2, 3];
 
-  return figuresToRemove[figuresCountLowerThreshold.indexOf(thresholdLength)];
+  let greaterLowerBound;
+  for (let i = 0; i < closedLowerBoundFiguresNumber.length; i++)
+    if (integerLength >= closedLowerBoundFiguresNumber[i])
+      greaterLowerBound = closedLowerBoundFiguresNumber[i];
 
-}
+  const lowerBoundMatch = closedLowerBoundFiguresNumber.indexOf(greaterLowerBound);
+  return lessSignificantFiguresToRemove[lowerBoundMatch];
 
-const onlySignificantFigures = numberString => {
-  const tailFiguresToRemove = insignificantFigures(numberString.length);
-  const head = tailFiguresToRemove > 0 ? numberString.slice(0, -1 * tailFiguresToRemove) : numberString;
-  const tail = '0'.repeat(tailFiguresToRemove);
+};
+
+const zeroNonSignificantFigures = integerString => {
+  const lessSignificantFiguresToRemove = insignificantFigures(integerString);
+  const head = lessSignificantFiguresToRemove > 0 ?
+    integerString.slice(0, -1 * lessSignificantFiguresToRemove) : integerString;
+  const tail = '0'.repeat(lessSignificantFiguresToRemove);
   return head + tail;
 };
 
 module.exports = {
-  onlySignificantFigures: onlySignificantFigures
+  zeroNonSignificantFigures: zeroNonSignificantFigures
 };

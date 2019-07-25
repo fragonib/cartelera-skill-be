@@ -37,7 +37,7 @@ const vocalizeRating = movie => {
 const vocalizeNumRating = movie => {
   if (movie.numRatings === null)
     return '';
-  const roundedNumber = number.onlySignificantFigures(String(movie.numRatings));
+  const roundedNumber = number.zeroNonSignificantFigures(String(movie.numRatings));
   return ` con <say-as interpret-as="cardinal">${roundedNumber}</say-as> votos`;
 };
 
